@@ -1,23 +1,62 @@
 rm(list=ls())
 
-region_sim <- function(cond_win){
-  qual <- matrix(0,nrow=16,ncol=6)
-  tmp <- cbind(matrix(seq(1,nrow(cond_win)),ncol=1),cond_win)
-  #region sim
-  for (i in 1:6){
-    #round 6
+tournament_sim <- function(cond_win){
+  regions <- c("East","South","MidWest","West")
+  full_bracket <- array(NA,dim=c(16,6,4))
+  region_winners <- matrix(NA,nrow=4,ncol=7)
+  for (i in 1:4){
+    ret <- region_sim(cond_win)
+    full_bracket[,,i] <- ret$qual
+    region_winners[i,] <- ret$winner
+  }
+  tmp <- cbind(matrix(seq(1:4),ncol=1),region_winners)
+  for (i in 1:2){
     tmp1 <- matrix(NA,nrow=nrow(tmp)/2,ncol=ncol(tmp))
-    for (j in 1:nrow(tmp)/2){
-      total <- tmp[j,i+1]+tmp[nrow(tmp)+1-j,i+1]
-      if (tmp[j,i+1] >= runif(1,0,total)){
+    for(j in 1:(nrow(tmp)/2)){
+      seed1 <- tmp[j,i+6]
+      seed2 <- tmp[nrow(tmp)+1-j,i+6]
+      total <- seed1 + seed2
+      val <- runif(1,0,1)
+      if ((seed1/total) >= val){
         tmp1[j,] <- tmp[j,]
+        full_bracket[tmp[j,1],i+4,tmp1[j,1]] <- 1
       }
       else{
         tmp1[j,] <- tmp[nrow(tmp)+1-j,]
+        full_bracket[tmp[nrow(tmp)+1-j,1],i+4,tmp1[j,1]] <- 1
       }
     }
+    tmp <- tmp1
   }
+  sprintf("Winner is seed %d from %s region",tmp[1,2],regions[tmp[1,1]])
+  out <- list("brackets" = full_bracket, "winner" = tmp)
+  return(out)
+}
 
+region_sim <- function(cond_win){
+  qual <- matrix(0,nrow=nrow(cond_win),ncol=6)
+  tmp <- cbind(matrix(seq(1,nrow(cond_win)),ncol=1),cond_win)
+  #simulate each round
+  for (i in 1:4){
+    tmp1 <- matrix(NA,nrow=nrow(tmp)/2,ncol=ncol(tmp))
+    for (j in 1:(nrow(tmp)/2)){
+      seed1 <- tmp[j,i+1]
+      seed2 <- tmp[nrow(tmp)+1-j,i+1]
+      total <- seed1 + seed2
+      val <- runif(1,0,1)
+      if ((seed1/total) >= val){
+        tmp1[j,] <- tmp[j,]
+        qual[tmp[j,1],i] <- 1
+      }
+      else{
+        tmp1[j,] <- tmp[nrow(tmp)+1-j,]
+        qual[tmp[nrow(tmp)+1-j,1],i] <- 1
+      }
+    }
+    tmp <- tmp1
+  }
+  out <- list("qual" = qual, "winner" = tmp)
+  return(out)
 }
 
 win_rate <- matrix(c(.987,.842,.664,.395,.243,.158,
@@ -57,5 +96,10 @@ condition_win <- matrix(c(.8531,.7886,.5949,.6152,.6502,
                         byrow=T,ncol=5)
 
 cond_win <- cbind(win_rate[,1],condition_win)
-cond_win
+
+regions <- c("East","South","MidWest","West")
+outcome <- tournament_sim(cond_win)
+brackets <- outcome$brackets
+winner <- outcome$winner
+sprintf("Winner is seed %d from %s region",winner[1,2],regions[winner[1,1]])
 
