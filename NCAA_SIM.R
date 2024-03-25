@@ -19,7 +19,7 @@ tournament_sim <- function(cond_win){
       seed2 <- tmp[nrow(tmp)+1-j,i+6]
       total <- seed1 + seed2
       val <- runif(1,0,1)
-      if ((seed1/total) >= val){
+      if (((seed1/total) >= val) | (total == seed1)){
         tmp1[j,] <- tmp[j,]
         full_bracket[tmp[j,2],i+4,tmp1[j,1]] <- 1
       }
@@ -46,7 +46,7 @@ region_sim <- function(cond_win){
       seed2 <- tmp[nrow(tmp)+1-j,i+1]
       total <- seed1 + seed2
       val <- runif(1,0,1)
-      if ((seed1/total) >= val){
+      if (((seed1/total) >= val) | (total == seed1)){
         tmp1[j,] <- tmp[j,]
         qual[tmp[j,1],i] <- 1
       }
@@ -108,10 +108,28 @@ condition_win <- matrix(c(.8531,.7886,.5949,.6152,.6502,
 cond_win <- cbind(win_rate[,1],condition_win)
 
 regions <- c("East","South","MidWest","West")
-outcome <- tournament_sim(cond_win)
-brackets <- outcome$brackets
-winner <- outcome$winner
-sprintf("Winner is seed %d from %s region",winner[1,2],regions[winner[1,1]])
 
-get_brackets(brackets)
+N <- 10000
+topseed_second <- 0
+topseed_third <- 0
+for (i in 1:N){
+  outcome <- tournament_sim(cond_win)
+  brackets <- outcome$brackets
+  winner <- outcome$winner
+  #sprintf("Winner is seed %d from %s region",winner[1,2],regions[winner[1,1]])
+  if (sum(brackets[1:8,1,]) == 32){
+    topseed_second <- topseed_second + 1
+  }
+  if (sum(brackets[1:4,2,]) == 16){
+    topseed_third <- topseed_third + 1
+  }
+}
 
+
+
+#Question 3
+prob2 <- topseed_second/N
+prob3 <- topseed_third/N
+sprintf("Likelihood of top seeds advancing second round %f",prob2)
+
+sprintf("Likelihood of top seeds advancing third round %f",prob3)
