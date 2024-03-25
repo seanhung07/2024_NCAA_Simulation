@@ -1,5 +1,7 @@
 rm(list=ls())
 
+library(ggplot2)
+
 tournament_sim <- function(cond_win){
   regions <- c("East","South","MidWest","West")
   full_bracket <- array(NA,dim=c(16,6,4))
@@ -19,11 +21,11 @@ tournament_sim <- function(cond_win){
       val <- runif(1,0,1)
       if ((seed1/total) >= val){
         tmp1[j,] <- tmp[j,]
-        full_bracket[tmp[j,1],i+4,tmp1[j,1]] <- 1
+        full_bracket[tmp[j,2],i+4,tmp1[j,1]] <- 1
       }
       else{
         tmp1[j,] <- tmp[nrow(tmp)+1-j,]
-        full_bracket[tmp[nrow(tmp)+1-j,1],i+4,tmp1[j,1]] <- 1
+        full_bracket[tmp[nrow(tmp)+1-j,2],i+4,tmp1[j,1]] <- 1
       }
     }
     tmp <- tmp1
@@ -57,6 +59,14 @@ region_sim <- function(cond_win){
   }
   out <- list("qual" = qual, "winner" = tmp)
   return(out)
+}
+
+get_brackets <- function(brackets){
+  regions <- c("East","South","MidWest","West")
+  for (i in 1:4){
+    sprintf("%s Bracket",regions[i])
+    print(brackets[,,i])
+  }
 }
 
 win_rate <- matrix(c(.987,.842,.664,.395,.243,.158,
@@ -102,4 +112,6 @@ outcome <- tournament_sim(cond_win)
 brackets <- outcome$brackets
 winner <- outcome$winner
 sprintf("Winner is seed %d from %s region",winner[1,2],regions[winner[1,1]])
+
+get_brackets(brackets)
 
