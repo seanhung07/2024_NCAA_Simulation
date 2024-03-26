@@ -143,8 +143,11 @@ prob3 <- topseed_third/N
 sprintf("Likelihood of top seeds advancing second round %f",prob2)
 
 sprintf("Likelihood of top seeds advancing third round %f",prob3)
+
+
+
+#Question 1
 get_detailed_round_data <- function(brackets) {
-  # Find the highest round each seed reached in each region
   round_advanced_data <- array(0, dim = c(16, 6, 4))
   for (r in 1:4) {
     for (s in 1:16) {
@@ -166,14 +169,14 @@ for (i in 1:N) {
   round_data_collection <- round_data_collection + detailed_round_data
 }
 
-dataset <- melt(round_data_collection, varnames = c("Seed", "Round", "Region"))
-dataset$Seed <- as.integer(dataset$Seed)
+round_data <- melt(round_data_collection, varnames = c("Seed", "Round", "Region"))
+round_data$Seed <- as.integer(round_data$Seed)
 
-dataset$Seed <- as.factor(dataset$Seed)
-dataset$Round <- as.factor(dataset$Round)
+round_data$Seed <- as.factor(round_data$Seed)
+round_data$Round <- as.factor(round_data$Round)
 
-g <- ggplot(dataset, aes(x = Seed, y = value, fill = Seed)) +
-  geom_bar(stat = "identity", fill = "gray") +
+g <- ggplot(round_data, aes(x = Seed, y = value, fill = Seed)) +
+  geom_bar(stat = "identity", fill= "gray") +
   facet_wrap(~ Round, scales = "free_y") +
   labs(title = "Distribution of Seeds by Round",
        x = "Seed",
