@@ -1,7 +1,7 @@
 rm(list=ls())
 
 library(ggplot2)
-
+library(reshape2)
 tournament_sim <- function(cond_win){
   regions <- c("East","South","MidWest","West")
   full_bracket <- array(NA,dim=c(16,6,4))
@@ -127,8 +127,8 @@ for (i in 1:N){
 
 #Question #2
 finalfour <- function(a,b,c,d){
-    prob <- win_rate[a,4]*win_rate[b,4]*win_rate[c, 4]*win_rate[d,4]
-    return(prob)
+  prob <- win_rate[a,4]*win_rate[b,4]*win_rate[c, 4]*win_rate[d,4]
+  return(prob)
 }
 
 tmp1 <- finalfour(1,1,1,1)
@@ -143,3 +143,41 @@ prob3 <- topseed_third/N
 sprintf("Likelihood of top seeds advancing second round %f",prob2)
 
 sprintf("Likelihood of top seeds advancing third round %f",prob3)
+get_detailed_round_data <- function(brackets) {
+  # Find the highest round each seed reached in each region
+  round_advanced_data <- array(0, dim = c(16, 6, 4))
+  for (r in 1:4) {
+    for (s in 1:16) {
+      for (round in 1:6) {
+        if (brackets[s, round, r] == 1) {
+          round_advanced_data[s, round, r] <- 1
+        }
+      }
+    }
+  }
+  return(round_advanced_data)
+}
+
+round_data_collection <- array(0, dim = c(16, 6, 4))
+for (i in 1:N) {
+  outcome <- tournament_sim(cond_win)
+  brackets <- outcome$brackets
+  detailed_round_data <- get_detailed_round_data(brackets)
+  round_data_collection <- round_data_collection + detailed_round_data
+}
+
+dataset <- melt(round_data_collection, varnames = c("Seed", "Round", "Region"))
+dataset$Seed <- as.integer(dataset$Seed)
+
+dataset$Seed <- as.factor(dataset$Seed)
+dataset$Round <- as.factor(dataset$Round)
+
+g <- ggplot(dataset, aes(x = Seed, y = value, fill = Seed)) +
+  geom_bar(stat = "identity", fill = "gray") +
+  facet_wrap(~ Round, scales = "free_y") +
+  labs(title = "Distribution of Seeds by Round",
+       x = "Seed",
+       y = "Frequency") +
+  theme_minimal()
+
+print(g)
