@@ -125,7 +125,17 @@ for (i in 1:N){
   }
 }
 
+#Question #2
+finalfour <- function(a,b,c,d){
+    prob <- win_rate[a,4]*win_rate[b,4]*win_rate[c, 4]*win_rate[d,4]
+    return(prob)
+}
 
+tmp1 <- finalfour(1,1,1,1)
+sprintf("Likelihood of five #1 seeds reaching final four %f",tmp1)
+
+tmp2 <- finalfour(3,3,2,1)
+sprintf("Likelihood of #1, #2, #3, #3 seeds reaching final four %f",tmp2)
 
 #Question 3
 prob2 <- topseed_second/N
