@@ -29,13 +29,13 @@ for (i in 2:length(y)){
 f0 <- (1 + f0.day)^d - 1
 plot(y=f0,x=t,type="l",main="Forward Rates")
 
-
 #simulation
 M <- 100
 N <- nStep
 r <- matrix(NA,ncol=N+1,nrow=M)
 r[,1] <- f0[1]
 sigma <- 0.001 # volatility of interest rates
+
 for (i in 1:N){
     Z <- rnorm(M)
     r[,i+1] <- r[,i] +
