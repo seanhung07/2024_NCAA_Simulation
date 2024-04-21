@@ -78,3 +78,31 @@ legend("topright",
        c("Mean", "95% VaR", "95% ES"),
        col = c("blue", "red", "red"), 
        lty = c(1, 2, 3))
+
+
+plot_fr <- function(scenarios, asset) {
+  rates <- scenarios[[asset]]
+  avg_rates <- apply(rates, 2, mean)
+  plot(avg_rates, type = 'l', col = 'blue', xlab = "Months", ylab = "FR",
+       main = paste("FR", asset))
+  grid(nx = NULL, ny = NULL)
+}
+plot_fr(scenarios, "UST")
+plot_fr(scenarios, "Agency")
+plot_fr(scenarios, "MBS")
+
+plot_all <- function(scenarios, assets) {
+  par(mfrow=c(1, length(assets)))
+  for (asset in assets) {
+    rates <- scenarios[[asset]]
+    avg_rates <- apply(rates, 2, mean)
+    plot(avg_rates, type = 'l', col = 'blue', xlab = "Months", ylab = "FR",
+         main = paste("FR:", asset))
+    grid(nx = NULL, ny = NULL)
+  }
+  par(mfrow=c(1, 1))
+}
+
+assets <- portfolio$asset_class
+plot_all(scenarios, assets)
+
