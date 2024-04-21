@@ -56,7 +56,36 @@ p <- ggplot(data = df.plot, aes(x = t, y = value, color = variable)) +
 p <- p + labs(x = "Time", y ="r(t)",title="Simulated Ho-Lee Model")
 print(p)
 
+my.duration <- function(t,c,f,ytm=NA,P=NA){
 
+    pv <- ((c*f)/ytm)*(1-(1/(1+ytm)^t))+(f/(1+ytm)^t) #calc present value of each bond
+    
+    df <- as.data.frame(matrix(NA,ncol=4,nrow=t)) #create empty df
+    df[,1] <- rep(c*f) #coupon pmts in col-1
+    df[t,1] <- f+(c*f) #principal repmt at final t
+    
+    #discount each coupon + principal repmt col-2
+    for (i in 1:t){
+        df[i,2] <- df[i,1]/(1+ytm)^(i)
+    }
+    
+    #weight each pmt in pv terms col-3
+    for (i in 1:t){
+        df[i,3] <- df[i,2]/pv
+    }
+    
+    #weight*period col-4
+    for (i in 1:t){
+        df[i,4] <- df[i,3]*i
+    }
+    
+    #macaulay duration = sum of 4th column 
+    mac.duration <- sum(df[,4])
+    
+    #modified duration
+    duration <- mac.duration/(1+ytm) 
+    return(duration)
+}
 
 
 
