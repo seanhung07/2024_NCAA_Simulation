@@ -1,7 +1,7 @@
+rm(list=ls())
 library(pracma)
 library(reshape)
 library(ggplot2)
-library(matrixStats)
 
 sim <- function(asset_class, N, M, sigma) {
   rates <- c(3.86, 4.18, 4.38, 4.60, 4.78, 4.75, 4.39, 4.10, 3.80, 3.73, 3.61, 3.84, 3.57) / 100
